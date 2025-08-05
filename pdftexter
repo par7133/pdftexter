@@ -10,6 +10,8 @@ param1=$1
 param2=$2
 param3=$3
 
+mydate=`date "+%Y%m%d-%H%M%S"`
+
 if [ ! -e /usr/local/bin/gs ]; then
   echo ""
   echo "System requirement: Ghostscript"
@@ -77,9 +79,9 @@ if [ "X$param2$param3" = "X" ]; then
     else
       printf .
 			if [ "X$param3" = "X" ]; then
-				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.output%d.tiff $param1 > /dev/null
+				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
 			else
-				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.output%d.tiff $param1 > /dev/null
+				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
 			fi 
     fi
   else
@@ -94,16 +96,16 @@ if [ "X$param2$param3" = "X" ]; then
 else 
   printf .
   if [ "X$param3" = "X" ]; then
-    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.output%d.tiff $param1 > /dev/null
+    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
   else
-    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.output%d.tiff $param1 > /dev/null
+    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
   fi 
 fi
 
-if [ -e "$root/cache.pdftexter/$bookmd5/final.txt" ]; then
-  rm "$root/cache.pdftexter/$bookmd5/final.txt"
+if [ -e "$root/cache.pdftexter/$bookmd5/$mydate-final.txt" ]; then
+  rm "$root/cache.pdftexter/$bookmd5/$mydate-final.txt"
 fi
-touch "$root/cache.pdftexter/$bookmd5/final.txt"
+touch "$root/cache.pdftexter/$bookmd5/$mydate-final.txt"
 
 #echo "processing.."
 printf .
@@ -113,12 +115,12 @@ until (( $i >= 2000 ))
 do
   let i+=1
   let y=$param2+$i-1
-  if [ -e "$root/cache.pdftexter/$bookmd5/.output$i.tiff" ]; then
+  if [ -e "$root/cache.pdftexter/$bookmd5/.$mydate-output$i.tiff" ]; then
     if [ ! -e "$root/cache.pdftexter/$bookmd5/.texter$y.txt" ]; then
-      tesseract $root/cache.pdftexter/$bookmd5/.output$i.tiff $root/cache.pdftexter/$bookmd5/.texter$y 2>/dev/null
+      tesseract $root/cache.pdftexter/$bookmd5/.$mydate-output$i.tiff $root/cache.pdftexter/$bookmd5/.texter$y 2>/dev/null
     fi
-    rm $root/cache.pdftexter/$bookmd5/.output$i.tiff
-    cat $root/cache.pdftexter/$bookmd5/.texter$y.txt >> $root/cache.pdftexter/$bookmd5/final.txt 2>/dev/null
+    rm $root/cache.pdftexter/$bookmd5/.$mydate-output$i.tiff
+    cat $root/cache.pdftexter/$bookmd5/.texter$y.txt >> $root/cache.pdftexter/$bookmd5/$mydate-final.txt 2>/dev/null
   else
     break
   fi  
@@ -135,8 +137,8 @@ fi
 
 #rm $root/cache.pdftexter/.texter.txt
 
-cat $root/cache.pdftexter/$bookmd5/final.txt | less
-rm $root/cache.pdftexter/$bookmd5/final.txt
+cat $root/cache.pdftexter/$bookmd5/$mydate-final.txt | less
+rm $root/cache.pdftexter/$bookmd5/$mydate-final.txt
 #if [ -d $root/cache.pdftexter ]; then
 #  rmdir $root/cache.pdftexter 2>/dev/null
 #fi
