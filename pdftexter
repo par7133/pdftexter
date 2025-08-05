@@ -1,0 +1,86 @@
+#!/bin/ksh
+# This file is part of pdftexter and is targeting primarly OpenBSD
+# System requirements: Ghostscript Tesseract
+# Copyright 5 Mode and other contributors; Licensed MIT
+echo "This file is part of pdftexter and is targeting primarly OpenBSD"
+echo "System requirements: Ghostscript Tesseract"
+echo "Copyright © 5 Mode and other contributors; Licensed MIT"
+
+param1=$1
+param2=$2
+param3=$3
+
+checksys1=`ls /usr/local/bin/gs 2>/dev/null|grep '/usr/local/bin/gs'`
+if [ "X$checksys1" = "X" ]; then
+  echo "System requirements: Ghostscript"
+  exit 1
+fi
+
+checksys2=`ls /usr/local/bin/tesseract 2>/dev/null|grep '/usr/local/bin/tesseract'`
+if [ "X$checksys2" = "X" ]; then
+  echo "System requirements: Tesseract"
+  exit 1
+fi
+
+if [ "$param1" = "-h" ]; then
+  echo "System requirements: Ghostscript Tesseract"
+  echo "Usage: pdftexter [file] [firstpage] [lastpage]"
+  exit 0
+fi
+
+if [ "X$param1$param2$param3" = "X" ]; then
+  echo "System requirements: Ghostscript Tesseract"
+  echo "Usage: pdftexter [file] [firstpage] [lastpage]"
+  exit 0
+fi
+
+#echo "converting.."
+printf .
+
+if [ ! -d ./tmp ]; then
+  mkdir ./tmp
+fi
+
+if [ "X$param2$param3" = "X" ]; then
+  gs -dBATCH -dNOPAUSE -sDEVICE=tiffgray -r200x200 -sOutputFile=./tmp/.output%d.tiff $param1 > /dev/null
+else 
+  if [ "X$param3" = "X" ]; then
+    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=./tmp/.output%d.tiff $param1 > /dev/null
+  else
+    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=./tmp/.output%d.tiff $param1 > /dev/null
+  fi 
+fi
+
+if [ -e ./tmp/final.txt ]; then
+  rm ./tmp/final.txt
+fi
+touch ./tmp/final.txt
+
+#echo "processing.."
+printf .
+
+let i=0
+until (( $i >= 2000 ))
+do
+  let i+=1
+  if [ -e "./tmp/.output$i.tiff" ]; then
+    tesseract ./tmp/.output$i.tiff ./tmp/.texter 2>/dev/null
+    rm ./tmp/.output$i.tiff
+    cat ./tmp/.texter.txt >> ./tmp/final.txt 2>/dev/null
+  else
+    break
+  fi  
+done
+
+#echo "loading.."
+printf .
+sleep 1.5
+printf "\b\b\b"
+
+rm ./tmp/.texter.txt
+
+cat ./tmp/final.txt | less
+rm ./tmp/final.txt
+if [ -d ./tmp ]; then
+  rmdir ./tmp 2>/dev/null
+fi
