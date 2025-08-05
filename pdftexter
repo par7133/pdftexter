@@ -37,6 +37,12 @@ fi
 
 #echo "converting.."
 
+if [ ! -e $param1 ]; then
+  echo ""
+  echo "$param1 doesn't exist."
+  exit 1
+fi
+
 if [ ! -d ./cache.pdftexter ]; then
   mkdir ./cache.pdftexter
 fi
