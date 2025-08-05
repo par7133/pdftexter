@@ -45,7 +45,7 @@ fi
 
 bookmd5=`cksum -a md5 -q $param1`
 
-root=~/.local/share/pdftexter
+root=~/.cache/pdftexter
 if [ ! -d $root ]; then
   mkdir $root
 fi
