@@ -9,8 +9,7 @@ echo "Copyright © 5 Mode and other contributors; Licensed MIT"
 param1=$1
 param2=$2
 param3=$3
-
-mydate=`date "+%Y%m%d-%H%M%S"`
+param4=$4
 
 if [ ! -e /usr/local/bin/gs ]; then
   echo ""
@@ -27,13 +26,13 @@ fi
 
 if [ "$param1" = "-h" ]; then
   echo ""
-  echo "Usage: pdftexter [file] [firstpage] [lastpage]"
+  echo "Usage: pdftexter [file] -- [firstpage] [lastpage]"
   exit 0
 fi
 
-if [ "X$param1$param2$param3" = "X" ]; then
+if [ "X$param1$param2$param3$param4" = "X" ]; then
   echo ""
-  echo "Usage: pdftexter [file] [firstpage] [lastpage]"
+  echo "Usage: pdftexter [file] -- [firstpage] [lastpage]"
   exit 0
 fi
 
@@ -44,6 +43,22 @@ if [ ! -e $param1 ]; then
   echo "$param1 doesn't exist."
   exit 1
 fi
+
+if [ "X$param2" = "X--" ]; then
+  mydate=`date "+%Y%m%d-%H%M%S"`
+else
+  testyear=`date "+%Y"`
+  res=`echo $param2|grep -e ^/$testyear/`
+  if [ "X$res" = "X" ]; then
+    echo ""
+    echo "Usage: pdftexter [file] -- [firstpage] [lastpage]"
+    echo ""
+    echo "Invalid param2."
+    exit 1
+  fi
+  mydate=$param2
+fi
+#mydate=`date "+%Y%m%d-%H%M%S"`
 
 bookmd5=`cksum -a md5 -q $param1`
 
@@ -61,7 +76,7 @@ if [ ! -d $root/cache.pdftexter/$bookmd5 ]; then
 fi
 
 let showedmenu=0
-if [ "X$param2$param3" = "X" ]; then
+if [ "X$param3$param4" = "X" ]; then
   if [ -e "./$param1.idx" ]; then
     let showedmenu=1
     echo ""
@@ -72,16 +87,16 @@ if [ "X$param2$param3" = "X" ]; then
     echo ""
     echo ""
     printf "Type a page or a range: " 
-    read param2 param3
-    if [ "X$param2$param3" = "X" ]; then
+    read param3 param4
+    if [ "X$param3$param4" = "X" ]; then
       echo "We can't proceed.. bye!"
       exit 1
     else
       printf .
-			if [ "X$param3" = "X" ]; then
-				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
+			if [ "X$param4" = "X" ]; then
+				gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
 			else
-				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
+				gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param4 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
 			fi 
     fi
   else
@@ -95,10 +110,10 @@ if [ "X$param2$param3" = "X" ]; then
   fi
 else 
   printf .
-  if [ "X$param3" = "X" ]; then
-    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
+  if [ "X$param4" = "X" ]; then
+    gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
   else
-    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
+    gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param4 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
   fi 
 fi
 
@@ -114,7 +129,7 @@ let i=0
 until (( $i >= 2000 ))
 do
   let i+=1
-  let y=$param2+$i-1
+  let y=$param3+$i-1
   if [ -e "$root/cache.pdftexter/$bookmd5/.$mydate-output$i.tiff" ]; then
     if [ ! -e "$root/cache.pdftexter/$bookmd5/.texter$y.txt" ]; then
       tesseract $root/cache.pdftexter/$bookmd5/.$mydate-output$i.tiff $root/cache.pdftexter/$bookmd5/.texter$y 2>/dev/null
