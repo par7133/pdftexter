@@ -58,9 +58,7 @@ if [ "X$param2$param3" = "X" ]; then
     echo ""
     echo ""
     echo ""
-    echo ""
-    echo ""    
-    printf "type your pages: " 
+    printf "Type a page or a range: " 
     read param2 param3
     if [ "X$param2$param3" = "X" ]; then
       echo "We can't proceed.. bye!"
