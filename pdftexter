@@ -10,39 +10,39 @@ param1=$1
 param2=$2
 param3=$3
 
-checksys1=`ls /usr/local/bin/gs 2>/dev/null|grep '/usr/local/bin/gs'`
-if [ "X$checksys1" = "X" ]; then
-  echo "System requirements: Ghostscript"
+if [ ! -e /usr/local/bin/gs ]; then
+  echo ""
+  echo "System requirement: Ghostscript"
   exit 1
 fi
 
-checksys2=`ls /usr/local/bin/tesseract 2>/dev/null|grep '/usr/local/bin/tesseract'`
-if [ "X$checksys2" = "X" ]; then
-  echo "System requirements: Tesseract"
+if [ ! -e /usr/local/bin/tesseract ]; then
+  echo ""
+  echo "System requirement: Tesseract"
   exit 1
 fi
+
 
 if [ "$param1" = "-h" ]; then
-  echo "System requirements: Ghostscript Tesseract"
+  echo ""
   echo "Usage: pdftexter [file] [firstpage] [lastpage]"
   exit 0
 fi
 
 if [ "X$param1$param2$param3" = "X" ]; then
-  echo "System requirements: Ghostscript Tesseract"
+  echo ""
   echo "Usage: pdftexter [file] [firstpage] [lastpage]"
   exit 0
 fi
 
 #echo "converting.."
 
-if [ ! -d ./tmp ]; then
-  mkdir ./tmp
+if [ ! -d ./cache.pdftexter ]; then
+  mkdir ./cache.pdftexter
 fi
 
 let showedmenu=0
 if [ "X$param2$param3" = "X" ]; then
-  #gs -dBATCH -dNOPAUSE -sDEVICE=tiffgray -r200x200 -sOutputFile=./tmp/.output%d.tiff $param1 > /dev/null
   if [ -e "./$param1.idx" ]; then
     let showedmenu=1
     echo ""
@@ -62,14 +62,14 @@ if [ "X$param2$param3" = "X" ]; then
     else
       printf .
 			if [ "X$param3" = "X" ]; then
-				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=./tmp/.output%d.tiff $param1 > /dev/null
+				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=./cache.pdftexter/.output%d.tiff $param1 > /dev/null
 			else
-				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=./tmp/.output%d.tiff $param1 > /dev/null
+				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=./cache.pdftexter/.output%d.tiff $param1 > /dev/null
 			fi 
     fi
   else
-		if [ -d ./tmp ]; then
-			rmdir ./tmp 2>/dev/null
+		if [ -d ./cache.pdftexter ]; then
+			rmdir ./cache.pdftexter 2>/dev/null
 		fi
 
     echo ""
@@ -79,16 +79,16 @@ if [ "X$param2$param3" = "X" ]; then
 else 
   printf .
   if [ "X$param3" = "X" ]; then
-    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=./tmp/.output%d.tiff $param1 > /dev/null
+    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=./cache.pdftexter/.output%d.tiff $param1 > /dev/null
   else
-    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=./tmp/.output%d.tiff $param1 > /dev/null
+    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=./cache.pdftexter/.output%d.tiff $param1 > /dev/null
   fi 
 fi
 
-if [ -e ./tmp/final.txt ]; then
-  rm ./tmp/final.txt
+if [ -e ./cache.pdftexter/final.txt ]; then
+  rm ./cache.pdftexter/final.txt
 fi
-touch ./tmp/final.txt
+touch ./cache.pdftexter/final.txt
 
 #echo "processing.."
 printf .
@@ -97,10 +97,10 @@ let i=0
 until (( $i >= 2000 ))
 do
   let i+=1
-  if [ -e "./tmp/.output$i.tiff" ]; then
-    tesseract ./tmp/.output$i.tiff ./tmp/.texter 2>/dev/null
-    rm ./tmp/.output$i.tiff
-    cat ./tmp/.texter.txt >> ./tmp/final.txt 2>/dev/null
+  if [ -e "./cache.pdftexter/.output$i.tiff" ]; then
+    tesseract ./cache.pdftexter/.output$i.tiff ./cache.pdftexter/.texter 2>/dev/null
+    rm ./cache.pdftexter/.output$i.tiff
+    cat ./cache.pdftexter/.texter.txt >> ./cache.pdftexter/final.txt 2>/dev/null
   else
     break
   fi  
@@ -115,10 +115,10 @@ else
   clear
 fi
 
-rm ./tmp/.texter.txt
+rm ./cache.pdftexter/.texter.txt
 
-cat ./tmp/final.txt | less
-rm ./tmp/final.txt
-if [ -d ./tmp ]; then
-  rmdir ./tmp 2>/dev/null
+cat ./cache.pdftexter/final.txt | less
+rm ./cache.pdftexter/final.txt
+if [ -d ./cache.pdftexter ]; then
+  rmdir ./cache.pdftexter 2>/dev/null
 fi
