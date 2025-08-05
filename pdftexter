@@ -35,15 +35,43 @@ if [ "X$param1$param2$param3" = "X" ]; then
 fi
 
 #echo "converting.."
-printf .
 
 if [ ! -d ./tmp ]; then
   mkdir ./tmp
 fi
 
 if [ "X$param2$param3" = "X" ]; then
-  gs -dBATCH -dNOPAUSE -sDEVICE=tiffgray -r200x200 -sOutputFile=./tmp/.output%d.tiff $param1 > /dev/null
+  #gs -dBATCH -dNOPAUSE -sDEVICE=tiffgray -r200x200 -sOutputFile=./tmp/.output%d.tiff $param1 > /dev/null
+  if [ -e "./$param1.idx" ]; then
+    echo ""
+    echo "Main Index:"
+    echo ""
+    cat ./$param1.idx
+    echo ""
+    echo ""
+    echo ""
+    echo ""
+    echo ""    
+    printf "type your pages: " 
+    read param2 param3
+    if [ "X$param2$param3" = "X" ]; then
+      echo "We can't proceed.. bye!"
+      exit 1
+    else
+      printf .
+			if [ "X$param3" = "X" ]; then
+				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=./tmp/.output%d.tiff $param1 > /dev/null
+			else
+				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=./tmp/.output%d.tiff $param1 > /dev/null
+			fi 
+    fi
+  else
+    echo ""
+    echo "Setup a '$param1.idx' index for your pdf using the format '[Chapter description]... [FirstPage] [LastPage]\\\n', please."
+    exit 1
+  fi
 else 
+  printf .
   if [ "X$param3" = "X" ]; then
     gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=./tmp/.output%d.tiff $param1 > /dev/null
   else
