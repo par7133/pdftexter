@@ -43,8 +43,19 @@ if [ ! -e $param1 ]; then
   exit 1
 fi
 
-if [ ! -d ./cache.pdftexter ]; then
-  mkdir ./cache.pdftexter
+bookmd5=`cksum -a md5 -q $param1`
+
+root=~/.local/share/pdftexter
+if [ ! -d $root ]; then
+  mkdir $root
+fi
+
+if [ ! -d $root/cache.pdftexter ]; then
+  mkdir $root/cache.pdftexter
+fi
+
+if [ ! -d $root/cache.pdftexter/$bookmd5 ]; then
+  mkdir $root/cache.pdftexter/$bookmd5
 fi
 
 let showedmenu=0
@@ -66,15 +77,15 @@ if [ "X$param2$param3" = "X" ]; then
     else
       printf .
 			if [ "X$param3" = "X" ]; then
-				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=./cache.pdftexter/.output%d.tiff $param1 > /dev/null
+				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.output%d.tiff $param1 > /dev/null
 			else
-				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=./cache.pdftexter/.output%d.tiff $param1 > /dev/null
+				gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.output%d.tiff $param1 > /dev/null
 			fi 
     fi
   else
-		if [ -d ./cache.pdftexter ]; then
-			rmdir ./cache.pdftexter 2>/dev/null
-		fi
+		#if [ -d $root/cache.pdftexter ]; then
+		#	rmdir .$root/cache.pdftexter 2>/dev/null
+		#fi
 
     echo ""
     echo "Setup a '$param1.idx' index for your pdf using the format '[Chapter description]... [FirstPage] [LastPage]\\\n', please."
@@ -83,16 +94,16 @@ if [ "X$param2$param3" = "X" ]; then
 else 
   printf .
   if [ "X$param3" = "X" ]; then
-    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=./cache.pdftexter/.output%d.tiff $param1 > /dev/null
+    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param2 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.output%d.tiff $param1 > /dev/null
   else
-    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=./cache.pdftexter/.output%d.tiff $param1 > /dev/null
+    gs -dBATCH -dNOPAUSE -dFirstPage=$param2 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.output%d.tiff $param1 > /dev/null
   fi 
 fi
 
-if [ -e ./cache.pdftexter/final.txt ]; then
-  rm ./cache.pdftexter/final.txt
+if [ -e "$root/cache.pdftexter/$bookmd5/final.txt" ]; then
+  rm "$root/cache.pdftexter/$bookmd5/final.txt"
 fi
-touch ./cache.pdftexter/final.txt
+touch "$root/cache.pdftexter/$bookmd5/final.txt"
 
 #echo "processing.."
 printf .
@@ -101,10 +112,13 @@ let i=0
 until (( $i >= 2000 ))
 do
   let i+=1
-  if [ -e "./cache.pdftexter/.output$i.tiff" ]; then
-    tesseract ./cache.pdftexter/.output$i.tiff ./cache.pdftexter/.texter 2>/dev/null
-    rm ./cache.pdftexter/.output$i.tiff
-    cat ./cache.pdftexter/.texter.txt >> ./cache.pdftexter/final.txt 2>/dev/null
+  let y=$param2+$i-1
+  if [ -e "$root/cache.pdftexter/$bookmd5/.output$i.tiff" ]; then
+    if [ ! -e "$root/cache.pdftexter/$bookmd5/.texter$y.txt" ]; then
+      tesseract $root/cache.pdftexter/$bookmd5/.output$i.tiff $root/cache.pdftexter/$bookmd5/.texter$y 2>/dev/null
+    fi
+    rm $root/cache.pdftexter/$bookmd5/.output$i.tiff
+    cat $root/cache.pdftexter/$bookmd5/.texter$y.txt >> $root/cache.pdftexter/$bookmd5/final.txt 2>/dev/null
   else
     break
   fi  
@@ -119,10 +133,10 @@ else
   clear
 fi
 
-rm ./cache.pdftexter/.texter.txt
+#rm $root/cache.pdftexter/.texter.txt
 
-cat ./cache.pdftexter/final.txt | less
-rm ./cache.pdftexter/final.txt
-if [ -d ./cache.pdftexter ]; then
-  rmdir ./cache.pdftexter 2>/dev/null
-fi
+cat $root/cache.pdftexter/$bookmd5/final.txt | less
+rm $root/cache.pdftexter/$bookmd5/final.txt
+#if [ -d $root/cache.pdftexter ]; then
+#  rmdir $root/cache.pdftexter 2>/dev/null
+#fi
