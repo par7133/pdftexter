@@ -1,5 +1,5 @@
 # pdftexter
-A pdf textual reader for OpenBSD     
+A pdf textual reader for OpenBSD (script and web frontend) 
 
 <br>
 Screenshot:  
