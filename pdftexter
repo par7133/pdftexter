@@ -58,21 +58,30 @@ else
   fi
   mydate=$param2
 fi
-#mydate=`date "+%Y%m%d-%H%M%S"`
+
+if [ "X$param3$param4" != "X" ]; then
+	if (( $param3 > $param4 )); then
+		echo ""
+		echo "Usage: pdftexter [file] -- [firstpage] [lastpage]"
+		echo ""
+		echo "Invalid range."
+		exit 1
+	fi
+fi
 
 bookmd5=`cksum -a md5 -q $param1`
 
 root=~/.cache/pdftexter
-if [ ! -d $root ]; then
-  mkdir $root
+if [ ! -d "$root" ]; then
+  mkdir "$root"
 fi
 
-if [ ! -d $root/cache.pdftexter ]; then
-  mkdir $root/cache.pdftexter
+if [ ! -d "$root/cache.pdftexter" ]; then
+  mkdir "$root/cache.pdftexter"
 fi
 
-if [ ! -d $root/cache.pdftexter/$bookmd5 ]; then
-  mkdir $root/cache.pdftexter/$bookmd5
+if [ ! -d "$root/cache.pdftexter/$bookmd5" ]; then
+  mkdir "$root/cache.pdftexter/$bookmd5"
 fi
 
 let showedmenu=0
@@ -94,9 +103,9 @@ if [ "X$param3$param4" = "X" ]; then
     else
       printf .
 			if [ "X$param4" = "X" ]; then
-				gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
+				gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile="$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff" $param1 > /dev/null
 			else
-				gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param4 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
+				gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param4 -sDEVICE=tiffgray -r200x200 -sOutputFile="$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff" $param1 > /dev/null
 			fi 
     fi
   else
@@ -111,9 +120,9 @@ if [ "X$param3$param4" = "X" ]; then
 else 
   printf .
   if [ "X$param4" = "X" ]; then
-    gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
+    gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param3 -sDEVICE=tiffgray -r200x200 -sOutputFile="$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff" $param1 > /dev/null
   else
-    gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param4 -sDEVICE=tiffgray -r200x200 -sOutputFile=$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff $param1 > /dev/null
+    gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param4 -sDEVICE=tiffgray -r200x200 -sOutputFile="$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff" $param1 > /dev/null
   fi 
 fi
 
@@ -132,10 +141,10 @@ do
   let y=$param3+$i-1
   if [ -e "$root/cache.pdftexter/$bookmd5/.$mydate-output$i.tiff" ]; then
     if [ ! -e "$root/cache.pdftexter/$bookmd5/.texter$y.txt" ]; then
-      tesseract $root/cache.pdftexter/$bookmd5/.$mydate-output$i.tiff $root/cache.pdftexter/$bookmd5/.texter$y 2>/dev/null
+      tesseract "$root/cache.pdftexter/$bookmd5/.$mydate-output$i.tiff" "$root/cache.pdftexter/$bookmd5/.texter$y" 2>/dev/null
     fi
-    rm $root/cache.pdftexter/$bookmd5/.$mydate-output$i.tiff
-    cat $root/cache.pdftexter/$bookmd5/.texter$y.txt >> $root/cache.pdftexter/$bookmd5/$mydate-final.txt 2>/dev/null
+    rm "$root/cache.pdftexter/$bookmd5/.$mydate-output$i.tiff"
+    cat "$root/cache.pdftexter/$bookmd5/.texter$y.txt" >> "$root/cache.pdftexter/$bookmd5/$mydate-final.txt" 2>/dev/null
   else
     break
   fi  
@@ -152,8 +161,8 @@ fi
 
 #rm $root/cache.pdftexter/.texter.txt
 
-cat $root/cache.pdftexter/$bookmd5/$mydate-final.txt | less
-rm $root/cache.pdftexter/$bookmd5/$mydate-final.txt
+cat "$root/cache.pdftexter/$bookmd5/$mydate-final.txt" | less
+rm "$root/cache.pdftexter/$bookmd5/$mydate-final.txt"
 #if [ -d $root/cache.pdftexter ]; then
 #  rmdir $root/cache.pdftexter 2>/dev/null
 #fi
