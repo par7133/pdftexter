@@ -11,7 +11,7 @@ Acceptable frontend calls:
 <br>
 http://myreader.puppy/web.php?pdf=Unix1.pdf  (call &lt;pdf&gt;.idx index if exists)  
 http://myreader.puppy/web.php?pdf=Unix1.pdf&frompage=10  
-http://myreader.doggy/web.php?pdf=Unix1.pdf&frompage=10&topage=15  
+http://myreader.puppy/web.php?pdf=Unix1.pdf&frompage=10&topage=15  
 
 Script web call for debugging purpose:
 <br>
