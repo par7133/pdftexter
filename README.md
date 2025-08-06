@@ -9,7 +9,7 @@ pdftexter Unix1.pdf -- 10 15
 
 Acceptable frontend calls:
 <br>
-http://myreader.puppy/web.php?pdf=Unix1.pdf     <-- (call &lt;pdf&gt;.idx index if exists)  
+http://myreader.puppy/web.php?pdf=Unix1.pdf     <-- (recall &lt;pdf&gt;.idx index if exists)  
 http://myreader.puppy/web.php?pdf=Unix1.pdf&frompage=10  
 http://myreader.puppy/web.php?pdf=Unix1.pdf&frompage=10&topage=15  
 
