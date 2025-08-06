@@ -2,44 +2,51 @@
 # This file is part of pdftexter and is targeting primarly OpenBSD
 # System requirements: Ghostscript Tesseract
 # Copyright 5 Mode and other contributors; Licensed MIT
-echo "This file is part of pdftexter and is targeting primarly OpenBSD"
-echo "System requirements: Ghostscript Tesseract"
-echo "Copyright © 5 Mode and other contributors; Licensed MIT"
+
+root="/pathto/myreader"
 
 param1=$1
 param2=$2
 param3=$3
 param4=$4
 
+function shellecho {
+  # IF WE ARE BY THE SHELL 
+  if [ "X$param2" = "X--" ]; then
+    echo $1
+  fi
+}
+shellecho "This file is part of pdftexter and is targeting primarly OpenBSD"
+shellecho "System requirements: Ghostscript Tesseract"
+shellecho "Copyright © 5 Mode and other contributors; Licensed MIT"
+
 if [ ! -e "/usr/local/bin/gs" ]; then
-  echo ""
-  echo "System requirement: Ghostscript"
+  shellecho ""
+  shellecho "System requirement: Ghostscript"
   exit 1
 fi
 
 if [ ! -e "/usr/local/bin/tesseract" ]; then
-  echo ""
-  echo "System requirement: Tesseract"
+  shellecho ""
+  shellecho "System requirement: Tesseract"
   exit 1
 fi
 
 if [ "$param1" = "-h" ]; then
-  echo ""
-  echo "Usage: pdftexter [file] -- [firstpage]? [lastpage]?"
+  shellecho ""
+  shellecho "Usage: pdftexter [file] -- [firstpage]? [lastpage]?"
   exit 0
 fi
 
 if [ "X$param1$param2$param3$param4" = "X" ]; then
-  echo ""
-  echo "Usage: pdftexter [file] -- [firstpage]? [lastpage]?"
+  shellecho ""
+  shellecho "Usage: pdftexter [file] -- [firstpage]? [lastpage]?"
   exit 0
 fi
 
-#echo "converting.."
-
 if [ ! -e "$param1" ]; then
-  echo ""
-  echo "$param1 doesn't exist."
+  shellecho ""
+  shellecho "$param1 doesn't exist."
   exit 1
 fi
 
@@ -47,12 +54,12 @@ if [ "X$param2" = "X--" ]; then
   mydate=`date "+%Y%m%d-%H%M%S"`
 else
   testyear=`date "+%Y"`
-  res=`echo $param2|grep -e ^/$testyear/`
+  res=`echo $param2|grep ^$testyear`
   if [ "X$res" = "X" ]; then
-    echo ""
-    echo "Usage: pdftexter [file] -- [firstpage]? [lastpage]?"
-    echo ""
-    echo "Invalid param2."
+    shellecho ""
+    shellecho "Usage: pdftexter [file] -- [firstpage]? [lastpage]?"
+    shellecho ""
+    shellecho "Invalid param2."
     exit 1
   fi
   mydate=$param2
@@ -65,56 +72,60 @@ if [ "X$param3$param4" != "X" ]; then
   fi
 
 	if (( $param3 > 2000 )); then
-		echo ""
-		echo "Invalid firstpage."
+		shellecho ""
+		shellecho "Invalid firstpage."
 		exit 1
 	fi
 
 	if (( $param4 > 2000 )); then
-		echo ""
-		echo "Invalid lastpage."
+		shellecho ""
+		shellecho "Invalid lastpage."
 		exit 1
 	fi
 
 	if (( $param3 > $param4 )); then
-		echo ""
-		echo "Usage: pdftexter [file] -- [firstpage]? [lastpage]?"
-		echo ""
-		echo "Invalid range."
+		shellecho ""
+		shellecho "Usage: pdftexter [file] -- [firstpage]? [lastpage]?"
+		shellecho ""
+		shellecho "Invalid range."
 		exit 1
 	fi
 fi
 
 bookmd5=`cksum -a md5 -q $param1`
 
-root=~/.cache/pdftexter
-if [ ! -d "$root" ]; then
-  mkdir "$root"
+if [ ! -d "$root/.cache-pdftexter" ]; then
+  mkdir "$root/.cache-pdftexter"
+  chmod "0777" "$root/.cache-pdftexter"
 fi
 
-if [ ! -d "$root/cache.pdftexter" ]; then
-  mkdir "$root/cache.pdftexter"
-fi
-
-if [ ! -d "$root/cache.pdftexter/$bookmd5" ]; then
-  mkdir "$root/cache.pdftexter/$bookmd5"
+if [ ! -d "$root/.cache-pdftexter/$bookmd5" ]; then
+  mkdir "$root/.cache-pdftexter/$bookmd5"
+  chmod "0777" "$root/.cache-pdftexter/$bookmd5"
 fi
 
 let showedmenu=0
 if [ "X$param3$param4" = "X" ]; then
   if [ -e "./$param1.idx" ]; then
-    let showedmenu=1
-    echo ""
-    echo "Main Index:"
-    echo ""
-    cat ./$param1.idx
-    echo ""
-    echo ""
-    echo ""
-    printf "Type a page or a range: " 
-    read param3 param4
+
+    # IF WE ARE BY THE SHELL 
+    if [ "X$param2" = "X--" ]; then
+
+		  let showedmenu=1
+		  shellecho ""
+		  shellecho "Main Index:"
+		  shellecho ""
+		  cat ./$param1.idx
+		  shellecho ""
+		  shellecho ""
+		  shellecho ""
+		  printf "Type a page or a range: " 
+		  read param3 param4
+    fi
+
     if [ "X$param3$param4" = "X" ]; then
-      echo "bye."
+      shellecho ""
+      shellecho "bye."
       exit 1
     else
 
@@ -122,65 +133,93 @@ if [ "X$param3$param4" = "X" ]; then
         param4=$param3
       fi 
 
-      printf .
-
-  		gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param4 -sDEVICE=tiffgray -r200x200 -sOutputFile="$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff" $param1 > /dev/null
+      # IF WE ARE NOT BY THE WEB..
+      if [ "X$param2" = "X--" ]; then
+        printf .
+      fi
+      
+      #convert -define delegate:bimodel=true $param1[$param3-$param4] "$root/.cache-pdftexter/$bookmd5/.$mydate-output%d.tiff"
+  		gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param4 -sDEVICE=tiffgray -r200x200 -sOutputFile="$root/.cache-pdftexter/$bookmd5/.$mydate-output%d.tiff" $param1 > /dev/null
 
     fi
   else
-		#if [ -d $root/cache.pdftexter ]; then
-		#	rmdir .$root/cache.pdftexter 2>/dev/null
+		#if [ -d $root/.cache-pdftexter ]; then
+		#	rmdir .$root/.cache-pdftexter 2>/dev/null
 		#fi
 
-    echo ""
-    echo "Setup a '$param1.idx' index for your pdf using the format '[Chapter description]... [FirstPage] [LastPage]\\\n', please."
+    shellecho ""
+    shellecho "Setup a '$param1.idx' index for your pdf using the format '[Chapter description]... [FirstPage] [LastPage]\\\n', please."
     exit 1
   fi
 else 
 
+  # IF WE ARE NOT BY THE WEB..
+  if [ "X$param2" = "X--" ]; then
+    printf .
+  fi
+
+  #convert -define delegate:bimodel=true $param1[$param3-$param4] "$root/.cache-pdftexter/$bookmd5/.$mydate-output%d.tiff"
+  gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param4 -sDEVICE=tiffgray -r200x200 -sOutputFile="$root/.cache-pdftexter/$bookmd5/.$mydate-output%d.tiff" $param1 > /dev/null
+
+fi
+
+if [ -e "$root/.cache-pdftexter/$bookmd5/$mydate-final.txt" ]; then
+  rm "$root/.cache-pdftexter/$bookmd5/$mydate-final.txt"
+fi
+touch "$root/.cache-pdftexter/$bookmd5/$mydate-final.txt"
+chmod "0777" "$root/.cache-pdftexter/$bookmd5/$mydate-final.txt"
+
+# IF WE ARE NOT BY THE WEB..
+if [ "X$param2" = "X--" ]; then
   printf .
-
-  gs -dBATCH -dNOPAUSE -dFirstPage=$param3 -dLastPage=$param4 -sDEVICE=tiffgray -r200x200 -sOutputFile="$root/cache.pdftexter/$bookmd5/.$mydate-output%d.tiff" $param1 > /dev/null
-
 fi
-
-if [ -e "$root/cache.pdftexter/$bookmd5/$mydate-final.txt" ]; then
-  rm "$root/cache.pdftexter/$bookmd5/$mydate-final.txt"
-fi
-touch "$root/cache.pdftexter/$bookmd5/$mydate-final.txt"
-
-#echo "processing.."
-printf .
 
 let i=0
 until (( $i >= 2000 ))
 do
   let i+=1
   let y=$param3+$i-1
-  if [ -e "$root/cache.pdftexter/$bookmd5/.$mydate-output$i.tiff" ]; then
-    if [ ! -e "$root/cache.pdftexter/$bookmd5/.texter$y.txt" ]; then
-      tesseract "$root/cache.pdftexter/$bookmd5/.$mydate-output$i.tiff" "$root/cache.pdftexter/$bookmd5/.texter$y" 2>/dev/null
+  if [ -e "$root/.cache-pdftexter/$bookmd5/.$mydate-output$i.tiff" ]; then
+    if [ ! -e "$root/.cache-pdftexter/$bookmd5/.texter$y.txt" ]; then
+      tesseract "$root/.cache-pdftexter/$bookmd5/.$mydate-output$i.tiff" "$root/.cache-pdftexter/$bookmd5/.texter$y" 2>/dev/null
     fi
-    rm "$root/cache.pdftexter/$bookmd5/.$mydate-output$i.tiff"
-    cat "$root/cache.pdftexter/$bookmd5/.texter$y.txt" >> "$root/cache.pdftexter/$bookmd5/$mydate-final.txt" 2>/dev/null
+    rm "$root/.cache-pdftexter/$bookmd5/.$mydate-output$i.tiff"
+    cat "$root/.cache-pdftexter/$bookmd5/.texter$y.txt" >> "$root/.cache-pdftexter/$bookmd5/$mydate-final.txt" 2>/dev/null
+    #cat "$root/.cache-pdftexter/$bookmd5/.texter$y.txt" >> "$mydate-final.txt" 2>/dev/null
   else
     break
   fi  
+
+  #if [ -e "$root/.cache-pdftexter/$bookmd5/.$mydate-output$y.tiff" ]; then
+  #  if [ ! -e "$root/.cache-pdftexter/$bookmd5/.texter$y.txt" ]; then
+  #    tesseract "$root/.cache-pdftexter/$bookmd5/.$mydate-output$y.tiff" "$root/.cache-pdftexter/$bookmd5/.texter$y" 2>/dev/null
+  #  fi
+  #  rm "$root/.cache-pdftexter/$bookmd5/.$mydate-output$y.tiff"
+  #  cat "$root/.cache-pdftexter/$bookmd5/.texter$y.txt" >> "$root/.cache-pdftexter/$bookmd5/$mydate-final.txt" 2>/dev/null
+  #  #cat "$root/.cache-pdftexter/$bookmd5/.texter$y.txt" >> "$mydate-final.txt" 2>/dev/null
+  #else
+  #  break
+  #fi  
+
 done
 
-#echo "loading.."
-printf .
-sleep 1.5
-if [ $showedmenu = 0 ]; then
-  printf "\b\b\b"
+# IF WE ARE BY THE SHELL..
+if [ "X$param2" = "X--" ]; then
+	printf .
+	sleep 1.5
+	if [ $showedmenu = 0 ]; then
+		printf "\b\b\b"
+	else
+		clear
+	fi
+
+	cat "$root/.cache-pdftexter/$bookmd5/$mydate-final.txt" | less
+	rm "$root/.cache-pdftexter/$bookmd5/$mydate-final.txt"
+
+  if [ $showedmenu = 0 ]; then
+    shellecho "done."
+  fi
 else
-  clear
+
+  echo "$root/.cache-pdftexter/$bookmd5/$mydate-final.txt"
 fi
-
-#rm $root/cache.pdftexter/.texter.txt
-
-cat "$root/cache.pdftexter/$bookmd5/$mydate-final.txt" | less
-rm "$root/cache.pdftexter/$bookmd5/$mydate-final.txt"
-#if [ -d $root/cache.pdftexter ]; then
-#  rmdir $root/cache.pdftexter 2>/dev/null
-#fi
