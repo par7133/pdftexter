@@ -1,7 +1,7 @@
 # pdftexter
 A pdf textual reader for OpenBSD     
 
-
-screenshot:  
+<br>
+Screenshot:  
 
 <img src="screenshot1.png">
