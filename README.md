@@ -17,6 +17,12 @@ Script web call for debugging purpose:
 <br>
 t=`date "+%Y%m%d-%H%M%S"`; pdftexter Unix1.pdf $t 10 15
 
+Hope you can find it somewhat useful. Have fun!  
+<br>
+For any need of software additions, plugins and improvements please write to <a href="mailto:info@5mode.com">info@5mode.com</a>    
+<br>
+To help please donate by clicking <a href="https://gaox.io/l/dona1">https://gaox.io/l/dona1</a> and filling the form.   
+
 <br>
 Screenshot:  
 
