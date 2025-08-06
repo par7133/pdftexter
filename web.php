@@ -24,7 +24,9 @@
 			<style>
 				 body {
 				   background:#000000;
-				   color:#FFFFFF;
+				   color:lightgreen;
+           font-family: Monospace;
+           font-size: 17px; 
 				 }
 			</style>
 			
@@ -82,7 +84,7 @@
       echo("<br>");
       echo("<br>");
       echo("<br>");
-      echo("type a page or range:&nbsp;<input name='input' type='text'>");
+      echo("type a page or a range:&nbsp;<input name='input' type='text'>");
       echo("</form>");
       endBody();
       exit(0);
