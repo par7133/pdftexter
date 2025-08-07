@@ -17,7 +17,7 @@ Script web call for debugging purpose:
 <br>
 t=`date "+%Y%m%d-%H%M%S"`; pdftexter Unix1.pdf $t 10 15
 <br><br>
-Crontab example for the cleaner (crontab -e):
+Crontab example for the cleaner (crontab -e):  
 30 23 * * * /pathto/cleaner.sh -c
 <br>
 Hope you can find it somewhat useful. Have fun!  
