@@ -16,7 +16,7 @@ http://myreader.puppy/web.php?pdf=Unix1.pdf&frompage=10&topage=15
 Script web call for debugging purpose:
 <br>
 t=`date "+%Y%m%d-%H%M%S"`; pdftexter Unix1.pdf $t 10 15
-<br>
+<br><br>
 Crontab example for the cleaner (crontab -e):
 30 23 * * * /pathto/cleaner.sh -c
 <br>
