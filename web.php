@@ -10,16 +10,16 @@
 
 			<meta charset="UTF-8"/>
 
-      <meta name="viewport" content="width=device-width, initial-scale=0.8, minimum-scale=0.8, maximum-scale=0.8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=0.8, minimum-scale=0.8, maximum-scale=0.8"/>
 
 			<title>pdf reader</title> 
 
 			<link rel="shortcut icon" href="/favicon.ico" />
 				  
 			<meta name="description" content="pdf reader"/>
-			<meta name="keywords" content="5 Mode,pdf,reader"/>
+			<meta name="keywords" content="NuMode,pdf,reader"/>
 			<meta name="robots" content="noindex"/>
-			<meta name="author" content="5 Mode and contributors."/>
+			<meta name="author" content="NuMode"/>
 			
 			<style>
 				 body {
