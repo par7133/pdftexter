@@ -1,7 +1,7 @@
 #!/bin/ksh
 # This file is part of pdftexter and is targeting primarly OpenBSD
 # System requirements: Ghostscript Tesseract
-# Copyright 5 Mode and other contributors; Licensed MIT
+# Copyright NuMode and other contributors; Licensed MIT
 
 root="/pathto/myreader"
 
@@ -18,7 +18,7 @@ function shellecho {
 }
 shellecho "This file is part of pdftexter and is targeting primarly OpenBSD"
 shellecho "System requirements: Ghostscript Tesseract"
-shellecho "Copyright © 5 Mode and other contributors; Licensed MIT"
+shellecho "Copyright © NuMode and other contributors; Licensed MIT"
 
 if [ ! -e "/usr/local/bin/gs" ]; then
   shellecho ""
