@@ -30,4 +30,4 @@ Screenshot:
 
 <img src="screenshot1.png">
 
-Feedback: <a href="mailto:code@gaox.eu">code@gaox.eu</a>
+Feedback: <a href="mailto:code@gaox.io">code@gaox.io</a>
